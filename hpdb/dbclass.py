@@ -1,6 +1,5 @@
 import decimal
 import time
-import warnings
 from datetime import datetime
 from typing import Generator
 
@@ -79,8 +78,6 @@ class dbClass(object):
                 return self.engine.execute(sql.replace('%', '%%'), params=None)
             except (TimeoutError, OperationalError) as err:
                 if attempt < self.attempts - 1:
-                    warnings.warn( 'Retrying query ' + sql)
-                    print('retry')
                     time.sleep(self.retry_timeout)
                     continue # Try again
                 raise err  # Attempts ran out
@@ -165,7 +162,7 @@ class dbClass(object):
 
     def delete(self, table, wheredict):
         whereclause = ' AND '.join([f'{self.escape_char}{key}{self.escape_char}={self.quote}{wheredict[key]}{self.quote}' for key in wheredict.keys()])
-        sql = f'DELETE FROM {table} WHERE {whereclause}]'
+        sql = f'DELETE FROM {table} WHERE {whereclause}'
         if self.test:
             if not self.debug:
                 print(sql)
