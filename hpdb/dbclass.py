@@ -3,10 +3,11 @@ import time
 from datetime import datetime
 from typing import Generator
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
 import sqlparse
+import pandas as pd
 
 class dbClass(object):
 
@@ -75,7 +76,8 @@ class dbClass(object):
     def execute_with_retries(self, sql):
         for attempt in range(self.attempts):
             try:
-                return self.engine.execute(sql.replace('%', '%%'), params=None)
+                with self.engine.begin() as conn:
+                    return conn.execute(text(sql))
             except (TimeoutError, OperationalError) as err:
                 if attempt < self.attempts - 1:
                     time.sleep(self.retry_timeout)
@@ -187,5 +189,4 @@ class dbClass(object):
 
 
     def dataframe(self, query:str):
-        import pandas as pd
-        return pd.read_sql_query(query.replace('%', '%%'), self.engine)
+        return pd.DataFrame(self.query(query))
