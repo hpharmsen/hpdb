@@ -1,6 +1,6 @@
 # HPDB
 
-Current version: 4.0.3
+Current version: 4.0.4
 ## dbClass
 ### installation
 python -m pip install hpdb
